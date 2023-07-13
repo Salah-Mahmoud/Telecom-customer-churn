@@ -3,7 +3,7 @@ import pandas as pd
 import pickle
 
 # Load the data into a DataFrame (replace 'df' with your actual DataFrame)
-df = pd.read_csv(r'https://raw.githubusercontent.com/salah1911/Telecom-customer-churn/main/telecom_customer_churn.csv')
+df = pd.read_csv(r"https://raw.githubusercontent.com/salah1911/Telecom-customer-churn/main/telecom_customer_churn.csv")
 
 # Mapping dictionary for categorical features
 mapping = {
@@ -30,36 +30,43 @@ X = df[['Married', 'Number of Dependents', 'Number of Referrals',
 y = df['Customer Status']
 
 # Load the pickled model
-with open('RF.pkl', 'rb') as file:
+with open(r"RF.pkl", 'rb') as file:
     model = pickle.load(file)
 
 # Create the Streamlit app
-st.title("Customer Churn Prediction")
+st.set_page_config(layout="wide")  # Set wide layout for better streamlit experience
+st.markdown(
+    "<h1 style='text-align: center;'>Customer Churn Prediction📈</h1>",
+    unsafe_allow_html=True
+)
 st.write("This app predicts customer churn based on selected features.")
 
-# Display the DataFrame
-st.subheader("Data")
-st.write(df)
 
-# Show prediction form
-st.subheader("Churn Prediction")
-st.write("Enter the feature values for a customer to predict churn:")
-married = st.selectbox("Married", ['Yes', 'No'])
-dependents = st.number_input("Number of Dependents", min_value=0, max_value=10, value=0)
-referrals = st.number_input("Number of Referrals", min_value=0, max_value=10, value=0)
-tenure = st.number_input("Tenure in Months", min_value=0, max_value=100, value=0)
-offer = st.selectbox("Offer", ['None', 'Offer B', 'Offer E', 'Offer D', 'Offer A', 'Offer C'])
-internet_service = st.selectbox("Internet Service", ['Yes', 'No'])
-online_security = st.selectbox("Online Security", ['Yes', 'No'])
-online_backup = st.selectbox("Online Backup", ['Yes', 'No'])
-device_protection = st.selectbox("Device Protection Plan", ['Yes', 'No'])
-tech_support = st.selectbox("Premium Tech Support", ['Yes', 'No'])
-contract = st.selectbox("Contract", ['Month-to-Month', 'Two Year', 'One Year'])
-billing = st.selectbox("Paperless Billing", ['Yes', 'No'])
-total_charges = st.number_input("Total Charges", min_value=0.0, max_value=10000.0, value=0.0)
-long_distance_charges = st.number_input("Total Long Distance Charges", min_value=0.0, max_value=1000.0, value=0.0)
-total_revenue = st.number_input("Total Revenue", min_value=0.0, max_value=10000.0, value=0.0)
-age = st.number_input("Age", min_value=0, max_value=100, value=0)
+
+# Use columns for better organization
+col1, col2 = st.columns(2)
+
+# Column 1
+with col1:
+    married = st.selectbox("Married", ['Yes', 'No'])
+    dependents = st.number_input("Number of Dependents", min_value=0, max_value=10, value=0)
+    referrals = st.number_input("Number of Referrals", min_value=0, max_value=10, value=0)
+    tenure = st.number_input("Tenure in Months", min_value=0, max_value=100, value=0)
+    offer = st.selectbox("Offer", ['None', 'Offer B', 'Offer E', 'Offer D', 'Offer A', 'Offer C'])
+    internet_service = st.selectbox("Internet Service", ['Yes', 'No'])
+    online_security = st.selectbox("Online Security", ['Yes', 'No'])
+    online_backup = st.selectbox("Online Backup", ['Yes', 'No'])
+
+# Column 2
+with col2:
+    device_protection = st.selectbox("Device Protection Plan", ['Yes', 'No'])
+    tech_support = st.selectbox("Premium Tech Support", ['Yes', 'No'])
+    contract = st.selectbox("Contract", ['Month-to-Month', 'Two Year', 'One Year'])
+    billing = st.selectbox("Paperless Billing", ['Yes', 'No'])
+    total_charges = st.number_input("Total Charges", min_value=0.0, max_value=10000.0, value=0.0)
+    long_distance_charges = st.number_input("Total Long Distance Charges", min_value=0.0, max_value=1000.0, value=0.0)
+    total_revenue = st.number_input("Total Revenue", min_value=0.0, max_value=10000.0, value=0.0)
+    age = st.number_input("Age", min_value=0, max_value=100, value=0)
 
 # Make predictions
 input_data = [[married, dependents, referrals, tenure, offer, internet_service, online_security,
@@ -80,4 +87,7 @@ prediction = model.predict([input_data_mapped])
 
 if st.button("Predict"):
     churn_status = "Churn" if prediction[0] == 1 else "Not Churn"
-    st.write(f"The predicted churn status for the customer is: {churn_status}")
+    if churn_status == "Churn":
+        st.error(f"The predicted churn status for the customer is: {churn_status}")
+    else:
+        st.success(f"The predicted churn status for the customer is: {churn_status}")
